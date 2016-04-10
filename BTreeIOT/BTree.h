@@ -31,11 +31,17 @@ public:
 	CNode* Insert(int nKey, int nValue);
 
 private:
-	CNode* Insert(CNode* pNode, int nKey, int nValue);			/* insert helper */
-	int* MakeRecord(int nValue);								/* make a record */
-	int GetLeftIndex(CNode* pParent, CNode* pLeft);				/* get the left most index */
-	CNode* MakeNode();											/* make a normal node */
-	CNode* MakeRoot();											/* make a root node */
-	CNode* InsertInLeaf(CNode* pNode, int nKey, int* pPointer);	/* insert at leaf */
-
+	/* Insert node */
+	CNode* Insert(CNode* pNode, int nKey, int nValue);					/* insert helper */
+	CNode* NewTree(int nKey, int* pPointer);							/* create a new tree */
+	int* MakeRecord(int nValue);										/* make a record */
+	int GetLeftIndex(CNode* pParent, CNode* pLeft);						/* get the left most index */
+	CNode* MakeNode();													/* make a normal node */
+	CNode* MakeRoot();													/* make a root node */
+	CNode* InsertInLeaf(CNode* pNode, int nKey, int* pPointer);			/* insert at leaf */
+	CNode* InsertInLeafSplit(CNode* pNode, int nKey, int* pPointer);	/* insert at leaf after split */
+	CNode* InsertInNode(CNode* pParent, int nIndex, int nKey, CNode* pRight);		/* insert in node */
+	CNode* InsertInNodeSplit(CNode* pParent, int nIndex, int nKey, CNode* pRight);	/* insert in node after split */
+	CNode* InsertInRoot(int nKey, CNode* pLeft, CNode* pRight);			/* insert at root */
+	CNode* InsertInParent(int nKey, CNode* pLeft, CNode* pRight);		/* insert at parent */
 };
