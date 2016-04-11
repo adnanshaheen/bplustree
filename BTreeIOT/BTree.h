@@ -13,6 +13,10 @@ public:
 	bool m_bLeaf;			/* Is leaf node */
 	CNode* m_pParent;		/* Pointer to parent node */
 	CNode* m_pNext;			/* Pointer to next node */
+
+public:
+	CNode();
+	~CNode();
 };
 
 /*
@@ -22,10 +26,15 @@ class CBTree
 {
 private:
 	CNode* m_pRoot;			/* root node of btree */
+	uint32_t m_uOrder;		/* order of btree */
 
 public:
 	CBTree();				/* constructor */
 	~CBTree();				/* destructor */
+
+	/* get/set order */
+	inline uint32_t GetOrder() const { return m_uOrder; }
+	inline void SetOrder(const uint32_t uOrder) { m_uOrder = uOrder; }
 
 	/* Insert a node */
 	CNode* Insert(int nKey, int nValue);
