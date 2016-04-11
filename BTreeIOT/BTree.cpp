@@ -39,9 +39,23 @@ CNode * CBTree::NewTree(int nKey, int * pPointer)
 	return nullptr;
 }
 
+/*
+ * MakeRecord
+ *
+ * Make a record with value
+ */
 int * CBTree::MakeRecord(int nValue)
 {
-	return nullptr;
+	int* pRecord = NULL;
+	try {
+		pRecord = new int(nValue);
+		if (pRecord == NULL)
+			throw std::bad_alloc();
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+	return pRecord;
 }
 
 int CBTree::GetLeftIndex(CNode * pParent, CNode * pLeft)
@@ -70,7 +84,7 @@ CNode * CBTree::MakeNode()
 		if (pNode->m_ppPointer == NULL)
 			throw std::bad_alloc();
 	}
-	catch (std::exception ex) {
+	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
 	}
 	return pNode;
@@ -88,7 +102,7 @@ CNode * CBTree::MakeLeaf()
 		pNode = MakeNode();
 		pNode->SetLeaf();
 	}
-	catch (std::exception ex) {
+	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
 	}
 	return pNode;
