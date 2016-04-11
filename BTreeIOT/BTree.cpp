@@ -31,7 +31,16 @@ CBTree::~CBTree()
 */
 CNode * CBTree::Insert(int nKey, int nValue)
 {
-	return Insert(m_pRoot, nKey, nValue);
+	CNode* pNode = m_pRoot;
+	try {
+		/* find the node, duplicates are not allowed */
+		if (!Find(nKey))
+			pNode = Insert(m_pRoot, nKey, nValue);
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+	return pNode;
 }
 
 /*
@@ -43,10 +52,6 @@ CNode * CBTree::Insert(CNode * pNode, int nKey, int nValue)
 {
 	CNode* pNewNode = NULL;
 	try {
-		/* find the node, duplicates are not allowed */
-		if (Find(pNode, nKey))
-			return pNode;
-
 		int* pPointer = MakeRecord(nValue);				/* create a new record */
 		if (pPointer == NULL)
 			throw std::bad_alloc();
@@ -446,11 +451,29 @@ CNode * CBTree::InsertInParent(const int nKey, CNode * pLeft, CNode * pRight)
 	return nullptr;
 }
 
+/*
+* InsertInParent
+*
+* insert a new node in parent
+*/
 bool CBTree::Find(int nKey)
 {
-	return false;
+	bool bRes = false;
+	try {
+		Find(m_pRoot, nKey);
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+
+	return bRes;
 }
 
+/*
+* InsertInParent
+*
+* insert a new node in parent
+*/
 int * CBTree::Find(CNode * pNode, int nKey)
 {
 	return nullptr;
