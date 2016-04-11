@@ -479,13 +479,51 @@ int * CBTree::Find(CNode * pNode, int nKey)
 	return nullptr;
 }
 
+/*
+* FindLeaf
+*
+* Find a node with nKey
+*/
 CNode * CBTree::FindLeaf(int nKey)
 {
-	return nullptr;
+	CNode* pNode = NULL;
+	try {
+		if (m_pRoot == NULL)
+			throw std::exception("Empty tree!!!");
+
+		pNode = FindLeaf(m_pRoot, nKey);
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+
+	return pNode;
 }
 
+/*
+* FindLeaf
+*
+* Find a node, starting from pNode with nKey
+*/
 CNode * CBTree::FindLeaf(CNode * pNode, int nKey)
 {
+	try {
+		while (!pNode->IsLeaf()) {
+			int nIndex = 0;
+			while (nIndex < pNode->m_nKeys) {
+				if (nKey >= pNode->m_pKeys[nIndex])
+					++ nIndex;
+				else
+					break;
+			}
+
+			pNode = (CNode*) pNode->m_ppPointer[nIndex];
+		}
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+
 	return nullptr;
 }
 

@@ -7,7 +7,7 @@
 class CNode
 {
 public:
-	void** m_ppPointer;		/* N-number of pointers */
+	void** m_ppPointer;		/* N-number of pointers */ /* FIXME: Change it to CNode** */
 	int* m_pKeys;			/* N-1 number of keys */
 	uint32_t m_nKeys;		/* key values */
 	bool m_bLeaf;			/* Is leaf node */
@@ -52,7 +52,7 @@ private:
 	CNode* MakeNode();																				/* make a normal node */
 	CNode* MakeLeaf();																				/* make a leaf node */
 	CNode* InsertInLeaf(CNode* pNode, int nKey, int* pPointer);										/* insert at leaf */
-	CNode* SplitInsertLeaf(CNode* pNode, int nKey, int* pPointer);								/* insert at leaf after split */
+	CNode* SplitInsertLeaf(CNode* pNode, int nKey, int* pPointer);									/* insert at leaf after split */
 	CNode* InsertInNode(CNode* pParent, const uint32_t nIndex, const int nKey, CNode* pRight);		/* insert in node */
 	CNode* SplitInsertNode(CNode* pParent, const uint32_t nIndex, const int nKey, CNode* pRight);	/* insert in node after split */
 	CNode* InsertInRoot(const int nKey, CNode* pLeft, CNode* pRight);								/* insert at root */
