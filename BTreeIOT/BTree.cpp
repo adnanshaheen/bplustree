@@ -24,14 +24,50 @@ CBTree::~CBTree()
 {
 }
 
+/*
+* Insert
+*
+* Insert a new node in tree
+*/
 CNode * CBTree::Insert(int nKey, int nValue)
 {
-	return nullptr;
+	return Insert(m_pRoot, nKey, nValue);
 }
 
+/*
+* Insert
+*
+* Insert a new node in tree - helper function
+*/
 CNode * CBTree::Insert(CNode * pNode, int nKey, int nValue)
 {
-	return nullptr;
+	CNode* pNewNode = NULL;
+	try {
+		/* find the node, duplicates are not allowed */
+		if (Find(pNode, nKey))
+			return pNode;
+
+		int* pPointer = MakeRecord(nValue);				/* create a new record */
+		if (pPointer == NULL)
+			throw std::bad_alloc();
+
+		if (pNode == NULL)								/* create new tree */
+			pNewNode = NewTree(nKey, pPointer);
+
+		CNode* pLeaf = FindLeaf(nKey);					/* find the leaf node */
+		if (pLeaf == NULL)
+			throw std::bad_alloc();
+
+		if (pLeaf->m_nKeys > GetOrder() - 1)			/* space is available, insert here */
+			pLeaf = InsertInLeaf(pLeaf, nKey, pPointer);
+		else {
+			pNewNode = SplitInsertLeaf(pLeaf, nKey, pPointer);
+		}
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+	return pNewNode;
 }
 
 /*
@@ -407,6 +443,26 @@ CNode * CBTree::InsertInParent(const int nKey, CNode * pLeft, CNode * pRight)
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
 	}
+	return nullptr;
+}
+
+bool CBTree::Find(int nKey)
+{
+	return false;
+}
+
+int * CBTree::Find(CNode * pNode, int nKey)
+{
+	return nullptr;
+}
+
+CNode * CBTree::FindLeaf(int nKey)
+{
+	return nullptr;
+}
+
+CNode * CBTree::FindLeaf(CNode * pNode, int nKey)
+{
 	return nullptr;
 }
 

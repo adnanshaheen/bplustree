@@ -58,6 +58,12 @@ private:
 	CNode* InsertInRoot(const int nKey, CNode* pLeft, CNode* pRight);								/* insert at root */
 	CNode* InsertInParent(const int nKey, CNode* pLeft, CNode* pRight);								/* insert at parent */
 
+	/* Search node */
+	bool Find(int nKey);
+	int* Find(CNode* pNode, int nKey);
+	CNode* FindLeaf(int nKey);
+	CNode* FindLeaf(CNode* pNode, int nKey);
+
 	/* utility */
 	uint32_t Half() const;
 };
