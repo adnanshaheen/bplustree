@@ -47,7 +47,7 @@ CNode * CBTree::NewTree(int nKey, int * pPointer)
 		if (pNode) {
 			pNode->m_pKeys[0] = nKey;
 			pNode->m_ppPointer[0] = pPointer;
-			pNode->m_nKeys ++;
+			pNode->IncKeys();
 		}
 	}
 	catch (const std::exception& ex) {
@@ -75,9 +75,22 @@ int * CBTree::MakeRecord(int nValue)
 	return pRecord;
 }
 
-int CBTree::GetLeftIndex(CNode * pParent, CNode * pLeft)
+/*
+* GetLeftIndex
+*
+* find the left most index
+*/
+uint32_t CBTree::GetLeftIndex(CNode * pParent, CNode * pLeft)
 {
-	return 0;
+	uint32_t nIndex = 0;
+	try {
+		while (nIndex <= pParent->m_nKeys && pParent->m_ppPointer[nIndex] != pLeft)
+			++ nIndex;
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+	return nIndex;
 }
 
 /*
@@ -129,11 +142,11 @@ CNode * CBTree::InsertInLeaf(CNode * pNode, int nKey, int * pPointer)
 {
 	CNode* pResult = NULL;
 	try {
-		int nPos = 0;
-		while (nPos < pNode->m_nKeys && pNode->m_pKeys[nPos] < nKey)		/* find the position to insert in leaf */
+		uint32_t nPos = 0;
+		while (nPos < pNode->m_nKeys && pNode->m_pKeys[nPos] < nKey)			/* find the position to insert in leaf */
 			++ nPos;
 
-		for (int nKeyPos = pNode->m_nKeys; nKeyPos > nPos; ++ nKeyPos) {	/* adjust the previous keys and pointers */
+		for (uint32_t nKeyPos = pNode->m_nKeys; nKeyPos > nPos; ++ nKeyPos) {	/* adjust the previous keys and pointers */
 			pNode->m_pKeys[nKeyPos] = pNode->m_pKeys[nKeyPos - 1];
 			pNode->m_ppPointer[nKeyPos] = pNode->m_ppPointer[nKeyPos - 1];
 		}
@@ -141,7 +154,7 @@ CNode * CBTree::InsertInLeaf(CNode * pNode, int nKey, int * pPointer)
 		/* update the values */
 		pNode->m_pKeys[nPos] = nKey;
 		pNode->m_ppPointer[nPos] = pPointer;
-		pNode->m_nKeys ++;
+		pNode->IncKeys();
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
@@ -155,23 +168,55 @@ CNode * CBTree::InsertInLeafSplit(CNode * pNode, int nKey, int * pPointer)
 	return nullptr;
 }
 
-CNode * CBTree::InsertInNode(CNode * pParent, int nIndex, int nKey, CNode * pRight)
+CNode * CBTree::InsertInNode(CNode * pParent, const uint32_t nIndex, const int nKey, CNode * pRight)
 {
 	return nullptr;
 }
 
-CNode * CBTree::InsertInNodeSplit(CNode * pParent, int nIndex, int nKey, CNode * pRight)
+CNode * CBTree::InsertInNodeSplit(CNode * pParent, const uint32_t nIndex, const int nKey, CNode * pRight)
 {
 	return nullptr;
 }
 
-CNode * CBTree::InsertInRoot(int nKey, CNode * pLeft, CNode * pRight)
+CNode * CBTree::InsertInRoot(const int nKey, CNode * pLeft, CNode * pRight)
 {
+	CNode* pNode = NULL;
+	try {
+		pNode = MakeNode();
+		pNode->m_pKeys[0] = nKey;
+		pNode->m_ppPointer[0] = pLeft;
+		pNode->m_ppPointer[1] = pRight;
+		pNode->IncKeys();
+		pLeft->m_pParent = pNode;
+		pRight->m_pParent = pNode;
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
 	return nullptr;
 }
 
-CNode * CBTree::InsertInParent(int nKey, CNode * pLeft, CNode * pRight)
+/*
+* InsertInParent
+*
+* insert a new node in parent
+*/
+CNode * CBTree::InsertInParent(const int nKey, CNode * pLeft, CNode * pRight)
 {
+	CNode* pNode = NULL;
+	try {
+		if (pLeft == NULL || pRight == NULL)
+			throw std::exception("Invalid parameters!!!");
+		CNode* pParent = pLeft->m_pParent;
+		if (pParent == NULL)
+			pNode = InsertInRoot(nKey, pLeft, pRight);		/* create new root */
+		else if (pParent->m_nKeys < GetOrder() - 1)
+			pNode = InsertInNode(pParent, GetLeftIndex(pParent, pLeft), nKey, pRight);
+			
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
 	return nullptr;
 }
 
