@@ -127,7 +127,27 @@ CNode * CBTree::MakeLeaf()
 
 CNode * CBTree::InsertInLeaf(CNode * pNode, int nKey, int * pPointer)
 {
-	return nullptr;
+	CNode* pResult = NULL;
+	try {
+		int nPos = 0;
+		while (nPos < pNode->m_nKeys && pNode->m_pKeys[nPos] < nKey)		/* find the position to insert in leaf */
+			++ nPos;
+
+		for (int nKeyPos = pNode->m_nKeys; nKeyPos > nPos; ++ nKeyPos) {	/* adjust the previous keys and pointers */
+			pNode->m_pKeys[nKeyPos] = pNode->m_pKeys[nKeyPos - 1];
+			pNode->m_ppPointer[nKeyPos] = pNode->m_ppPointer[nKeyPos - 1];
+		}
+
+		/* update the values */
+		pNode->m_pKeys[nPos] = nKey;
+		pNode->m_ppPointer[nPos] = pPointer;
+		pNode->m_nKeys ++;
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+
+	return pResult;
 }
 
 CNode * CBTree::InsertInLeafSplit(CNode * pNode, int nKey, int * pPointer)
