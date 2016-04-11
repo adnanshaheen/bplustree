@@ -17,6 +17,9 @@ public:
 public:
 	CNode();
 	~CNode();
+
+	inline void SetLeaf(bool bLeaf = true) { m_bLeaf = bLeaf; }
+	inline bool IsLeaf() const { return m_bLeaf; }
 };
 
 /*
@@ -46,7 +49,7 @@ private:
 	int* MakeRecord(int nValue);										/* make a record */
 	int GetLeftIndex(CNode* pParent, CNode* pLeft);						/* get the left most index */
 	CNode* MakeNode();													/* make a normal node */
-	CNode* MakeRoot();													/* make a root node */
+	CNode* MakeLeaf();													/* make a leaf node */
 	CNode* InsertInLeaf(CNode* pNode, int nKey, int* pPointer);			/* insert at leaf */
 	CNode* InsertInLeafSplit(CNode* pNode, int nKey, int* pPointer);	/* insert at leaf after split */
 	CNode* InsertInNode(CNode* pParent, int nIndex, int nKey, CNode* pRight);		/* insert in node */

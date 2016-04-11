@@ -49,6 +49,11 @@ int CBTree::GetLeftIndex(CNode * pParent, CNode * pLeft)
 	return 0;
 }
 
+/*
+ * MakeNode
+ *
+ * Create a new node
+ */
 CNode * CBTree::MakeNode()
 {
 	CNode* pNode = NULL;
@@ -71,9 +76,22 @@ CNode * CBTree::MakeNode()
 	return pNode;
 }
 
-CNode * CBTree::MakeRoot()
+/*
+ * MakeLeaf
+ *
+ * make a leaf node
+ */
+CNode * CBTree::MakeLeaf()
 {
-	return nullptr;
+	CNode* pNode = NULL;
+	try {
+		pNode = MakeNode();
+		pNode->SetLeaf();
+	}
+	catch (std::exception ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+	return pNode;
 }
 
 CNode * CBTree::InsertInLeaf(CNode * pNode, int nKey, int * pPointer)
