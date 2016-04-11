@@ -34,9 +34,26 @@ CNode * CBTree::Insert(CNode * pNode, int nKey, int nValue)
 	return nullptr;
 }
 
+/*
+* NewTree
+*
+* Make a new tree
+*/
 CNode * CBTree::NewTree(int nKey, int * pPointer)
 {
-	return nullptr;
+	CNode* pNode = NULL;
+	try {
+		pNode = MakeLeaf();
+		if (pNode) {
+			pNode->m_pKeys[0] = nKey;
+			pNode->m_ppPointer[0] = pPointer;
+			pNode->m_nKeys ++;
+		}
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+	return pNode;
 }
 
 /*
