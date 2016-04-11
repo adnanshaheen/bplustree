@@ -452,15 +452,16 @@ CNode * CBTree::InsertInParent(const int nKey, CNode * pLeft, CNode * pRight)
 }
 
 /*
-* InsertInParent
+* Find
 *
-* insert a new node in parent
+* Find a key
 */
 bool CBTree::Find(int nKey)
 {
 	bool bRes = false;
 	try {
-		Find(m_pRoot, nKey);
+		if (Find(m_pRoot, nKey))
+			bRes = true;
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
@@ -470,13 +471,29 @@ bool CBTree::Find(int nKey)
 }
 
 /*
-* InsertInParent
+* Find
 *
-* insert a new node in parent
+* Find a key, starting from CNode
 */
-int * CBTree::Find(CNode * pNode, int nKey)
+CNode * CBTree::Find(CNode * pNode, int nKey)
 {
-	return nullptr;
+	try {
+		pNode = FindLeaf(pNode, nKey);
+		if (pNode != NULL) {
+			uint32_t nIndex = 0;
+			for (nIndex = 0; nIndex < pNode->m_nKeys; ++ nIndex)
+				if (pNode->m_pKeys[nIndex] == nKey)
+					break;
+			if (nIndex == pNode->m_nKeys)
+				pNode = NULL;
+			else
+				pNode = (CNode*) pNode->m_ppPointer[nIndex];
+		}
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+	return pNode;
 }
 
 /*

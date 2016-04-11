@@ -60,7 +60,7 @@ private:
 
 	/* Search node */
 	bool Find(int nKey);
-	int* Find(CNode* pNode, int nKey);
+	CNode* Find(CNode* pNode, int nKey);
 	CNode* FindLeaf(int nKey);
 	CNode* FindLeaf(CNode* pNode, int nKey);
 
