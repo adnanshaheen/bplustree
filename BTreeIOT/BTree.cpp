@@ -138,6 +138,11 @@ CNode * CBTree::MakeLeaf()
 	return pNode;
 }
 
+/*
+* InsertInLeaf
+*
+* Insert a new node in leaf
+*/
 CNode * CBTree::InsertInLeaf(CNode * pNode, int nKey, int * pPointer)
 {
 	CNode* pResult = NULL;
@@ -163,11 +168,96 @@ CNode * CBTree::InsertInLeaf(CNode * pNode, int nKey, int * pPointer)
 	return pResult;
 }
 
-CNode * CBTree::InsertInLeafSplit(CNode * pNode, int nKey, int * pPointer)
+/*
+* SplitInsertLeaf
+*
+* Split and then Insert a new node in leaf
+*/
+CNode * CBTree::SplitInsertLeaf(CNode * pNode, int nKey, int * pPointer)
 {
-	return nullptr;
+	CNode* pNewNode = NULL;
+	try {
+		if (pNode == NULL || pPointer == NULL)		/* check parameters */
+			throw std::exception("Invalid parameters!!!");
+
+		void** ppNodePointers = new void*[GetOrder()];		/* create temporary pointers */
+		if (ppNodePointers == NULL)
+			throw std::bad_alloc();
+
+		int* pKeys = new int[GetOrder()];					/* create temporary keys */
+		if (pKeys == NULL)
+			throw std::bad_alloc();
+
+		uint32_t nIndex = 0;
+		while (nIndex < GetOrder() - 1 && pNode->m_pKeys[nIndex] < nKey)
+			++ nIndex;
+
+		for (uint32_t i = 0, j = 0; i < pNode->m_nKeys; ++ i, ++ j) {	/* copy pointers */
+			if (nIndex == j)
+				++ j;
+			ppNodePointers[j] = pNode->m_ppPointer[i];
+		}
+
+		for (uint32_t i = 0, j = 0; i < pNode->m_nKeys; ++ i, ++ j) {		/* copy keys */
+			if (nIndex == j)
+				++ j;
+			pKeys[j] = pNode->m_pKeys[i];
+		}
+
+		ppNodePointers[nIndex] = pPointer;
+		pKeys[nIndex] = nKey;
+
+		/* Split in half */
+		uint32_t nHalf = Half();
+		pNode->m_nKeys = 0;
+		uint32_t nPrevKeys = 0;
+		for (nPrevKeys = 0; nPrevKeys < nHalf; ++ nPrevKeys) {		/* update the parent pointers and keys */
+			pNode->m_ppPointer[nPrevKeys] = ppNodePointers[nPrevKeys];
+			pNode->m_pKeys[nPrevKeys] = pKeys[nPrevKeys];
+			pNode->IncKeys();
+		}
+
+		pNewNode = MakeNode();		/* create new node */
+		if (pNewNode == NULL)
+			throw std::bad_alloc();
+
+		for (uint32_t nNextKeys = 0, nPrevKeys = nHalf; nPrevKeys < GetOrder(); ++ nPrevKeys, ++ nNextKeys) {	/* copy remaining half */
+			pNewNode->m_ppPointer[nNextKeys] = ppNodePointers[nPrevKeys];
+			pNewNode->m_pKeys[nNextKeys] = pKeys[nPrevKeys];
+			pNewNode->IncKeys();
+		}
+
+		/* free the temporary pointers and keys */
+		delete[] ppNodePointers;
+		delete[] pKeys;
+
+		pNewNode->m_ppPointer[GetOrder() - 1] = pNode->m_ppPointer[GetOrder() - 1];
+		pNode->m_ppPointer[GetOrder() - 1] = pNewNode;
+
+		for (uint32_t nNullKey = pNode->m_nKeys; nNullKey < GetOrder() - 1; ++ nNullKey)	/* set old pointers to null */
+			pNode->m_ppPointer[nNullKey] = NULL;
+
+		for (uint32_t nNullKey = pNewNode->m_nKeys; nNullKey < GetOrder() - 1; ++ nNullKey)	/* set pointers to null */
+			pNewNode->m_ppPointer[nNullKey] = NULL;
+
+		pNewNode->m_pParent = pNode->m_pParent;
+
+		/* insert new key in to parent */
+		CNode* pLeaf = InsertInParent(pNewNode->m_pKeys[0], pNode, pNewNode);	/* pNode = pLeft, pNewNode = pRight */
+		if (pLeaf)
+			pNewNode = pLeaf;
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+	return pNewNode;
 }
 
+/*
+* InsertInNode
+*
+* Insert a new node
+*/
 CNode * CBTree::InsertInNode(CNode * pParent, const uint32_t nIndex, const int nKey, CNode * pRight)
 {
 	CNode* pNode = NULL;
@@ -191,7 +281,12 @@ CNode * CBTree::InsertInNode(CNode * pParent, const uint32_t nIndex, const int n
 	return m_pRoot;
 }
 
-CNode * CBTree::InsertInNodeSplit(CNode * pParent, const uint32_t nIndex, const int nKey, CNode * pRight)
+/*
+* SplitInsertNode
+*
+* Split and insert a new node
+*/
+CNode * CBTree::SplitInsertNode(CNode * pParent, const uint32_t nIndex, const int nKey, CNode * pRight)
 {
 	CNode* pNode = NULL;
 	try {
@@ -307,7 +402,7 @@ CNode * CBTree::InsertInParent(const int nKey, CNode * pLeft, CNode * pRight)
 		else if (pParent->m_nKeys < GetOrder() - 1)
 			pNode = InsertInNode(pParent, GetLeftIndex(pParent, pLeft), nKey, pRight);		/* insert in the same node */
 		else
-			pNode = InsertInNodeSplit(pParent, GetLeftIndex(pParent, pLeft), nKey, pRight);	/* insert in splitted node */
+			pNode = SplitInsertNode(pParent, GetLeftIndex(pParent, pLeft), nKey, pRight);	/* insert in splitted node */
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;

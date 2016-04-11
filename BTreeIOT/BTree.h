@@ -52,9 +52,9 @@ private:
 	CNode* MakeNode();																				/* make a normal node */
 	CNode* MakeLeaf();																				/* make a leaf node */
 	CNode* InsertInLeaf(CNode* pNode, int nKey, int* pPointer);										/* insert at leaf */
-	CNode* InsertInLeafSplit(CNode* pNode, int nKey, int* pPointer);								/* insert at leaf after split */
+	CNode* SplitInsertLeaf(CNode* pNode, int nKey, int* pPointer);								/* insert at leaf after split */
 	CNode* InsertInNode(CNode* pParent, const uint32_t nIndex, const int nKey, CNode* pRight);		/* insert in node */
-	CNode* InsertInNodeSplit(CNode* pParent, const uint32_t nIndex, const int nKey, CNode* pRight);	/* insert in node after split */
+	CNode* SplitInsertNode(CNode* pParent, const uint32_t nIndex, const int nKey, CNode* pRight);	/* insert in node after split */
 	CNode* InsertInRoot(const int nKey, CNode* pLeft, CNode* pRight);								/* insert at root */
 	CNode* InsertInParent(const int nKey, CNode* pLeft, CNode* pRight);								/* insert at parent */
 
