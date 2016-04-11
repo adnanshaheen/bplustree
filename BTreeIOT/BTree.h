@@ -57,4 +57,7 @@ private:
 	CNode* InsertInNodeSplit(CNode* pParent, const uint32_t nIndex, const int nKey, CNode* pRight);	/* insert in node after split */
 	CNode* InsertInRoot(const int nKey, CNode* pLeft, CNode* pRight);								/* insert at root */
 	CNode* InsertInParent(const int nKey, CNode* pLeft, CNode* pRight);								/* insert at parent */
+
+	/* utility */
+	uint32_t Half() const;
 };

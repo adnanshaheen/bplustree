@@ -193,7 +193,77 @@ CNode * CBTree::InsertInNode(CNode * pParent, const uint32_t nIndex, const int n
 
 CNode * CBTree::InsertInNodeSplit(CNode * pParent, const uint32_t nIndex, const int nKey, CNode * pRight)
 {
-	return nullptr;
+	CNode* pNode = NULL;
+	try {
+		if (pParent == NULL || pRight == NULL)		/* check parameters */
+			throw std::exception("Invalid parameters!!!");
+
+		void** ppNodePointers = new void*[GetOrder() + 1];	/* create temporary pointers */
+		if (ppNodePointers == NULL)
+			throw std::bad_alloc();
+
+		int* pKeys = new int[GetOrder()];					/* create temporary keys */
+		if (pKeys == NULL)
+			throw std::bad_alloc();
+
+		for (uint32_t i = 0, j = 0; i < pParent->m_nKeys + 1; ++ i, ++ j) {	/* copy pointers */
+			if (nIndex + 1 == j)
+				++ j;
+			ppNodePointers[j] = pParent->m_ppPointer[i];
+		}
+
+		for (uint32_t i = 0, j = 0; i < pParent->m_nKeys; ++ i, ++ j) {		/* copy keys */
+			if (nIndex == j)
+				++ j;
+			pKeys[j] = pParent->m_pKeys[i];
+		}
+
+		ppNodePointers[nIndex + 1] = pParent;
+		pKeys[nIndex] = nKey;
+
+		/* Split in half */
+		uint32_t nHalf = Half();
+		pParent->m_nKeys = 0;
+		uint32_t nPrevKeys = 0;
+		for (nPrevKeys = 0; nPrevKeys < nHalf - 1; ++ nPrevKeys) {		/* update the parent pointers and keys */
+			pParent->m_ppPointer[nPrevKeys] = ppNodePointers[nPrevKeys];
+			pParent->m_pKeys[nPrevKeys] = pKeys[nPrevKeys];
+			pParent->IncKeys();
+		}
+		//pParent->m_ppPointer[nPrevKeys] = ppNodePointers[nPrevKeys];
+
+		pNode = MakeNode();		/* create new node */
+		if (pNode == NULL)
+			throw std::bad_alloc();
+
+		int nMiddleKey = pKeys[nHalf - 1];
+		for (uint32_t nNextKeys = 0; nPrevKeys < GetOrder(); ++ nPrevKeys, ++ nNextKeys) {	/* copy remaining half */
+			pNode->m_ppPointer[nNextKeys] = ppNodePointers[nPrevKeys];
+			pNode->m_pKeys[nNextKeys] = pKeys[nPrevKeys];
+			pNode->IncKeys();
+		}
+		pNode->m_pParent = pParent->m_pParent;
+		//pNode->m_ppPointer[nNextKeys] = ppNodePointers->m_ppPointer[nPrevKeys];
+
+		CNode* pChild = NULL;
+		for (uint32_t nNewKeys = 0; nNewKeys < pNode->m_nKeys; ++ nNewKeys) {
+			pChild = (CNode*) pNode->m_ppPointer[nNewKeys];					// FIXME: Use CNode** but not void**
+			pChild->m_pParent = pNode;
+		}
+
+		/* free the temporary pointers and keys */
+		delete[] ppNodePointers;
+		delete[] pKeys;
+
+		/* insert new key in to parent */
+		CNode* pNewNode = InsertInParent(nMiddleKey, pParent, pNode);	/* pParent = pLeft, pNode = pRight */
+		if (pNewNode)
+			pNode = pNewNode;
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+	return pNode;
 }
 
 /*
@@ -230,16 +300,30 @@ CNode * CBTree::InsertInParent(const int nKey, CNode * pLeft, CNode * pRight)
 	try {
 		if (pLeft == NULL || pRight == NULL)
 			throw std::exception("Invalid parameters!!!");
+
 		CNode* pParent = pLeft->m_pParent;
 		if (pParent == NULL)
 			pNode = InsertInRoot(nKey, pLeft, pRight);		/* create new root */
 		else if (pParent->m_nKeys < GetOrder() - 1)
-			pNode = InsertInNode(pParent, GetLeftIndex(pParent, pLeft), nKey, pRight);
-			
+			pNode = InsertInNode(pParent, GetLeftIndex(pParent, pLeft), nKey, pRight);		/* insert in the same node */
+		else
+			pNode = InsertInNodeSplit(pParent, GetLeftIndex(pParent, pLeft), nKey, pRight);	/* insert in splitted node */
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
 	}
 	return nullptr;
+}
+
+/*
+* Half
+*
+* Find the middle of order
+*/
+uint32_t CBTree::Half() const
+{
+	if (GetOrder() % 2)
+		return GetOrder() / 2;
+	return GetOrder() / 2 + 1;
 }
 
