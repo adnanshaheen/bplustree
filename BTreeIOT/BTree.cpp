@@ -170,7 +170,25 @@ CNode * CBTree::InsertInLeafSplit(CNode * pNode, int nKey, int * pPointer)
 
 CNode * CBTree::InsertInNode(CNode * pParent, const uint32_t nIndex, const int nKey, CNode * pRight)
 {
-	return nullptr;
+	CNode* pNode = NULL;
+	try {
+		if (pParent == NULL || pRight == NULL)		/* check parameters */
+			throw std::exception("Invalid parameters!!!");
+
+		for (uint32_t nKeyPos = pParent->m_nKeys; nKeyPos > 0; -- nKeyPos) {		/* update the pointers and keys */
+			pParent->m_ppPointer[nKeyPos + 1] = pParent->m_ppPointer[nKeyPos];
+			pParent->m_pKeys[nKeyPos] = pParent->m_pKeys[nKeyPos - 1];
+		}
+
+		/* set the new values */
+		pParent->m_ppPointer[nIndex + 1] = pRight;
+		pParent->m_pKeys[nIndex] = nKey;
+		pParent->IncKeys();
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+	return m_pRoot;
 }
 
 CNode * CBTree::InsertInNodeSplit(CNode * pParent, const uint32_t nIndex, const int nKey, CNode * pRight)
@@ -178,6 +196,11 @@ CNode * CBTree::InsertInNodeSplit(CNode * pParent, const uint32_t nIndex, const 
 	return nullptr;
 }
 
+/*
+* InsertInRoot
+*
+* insert a new node in root
+*/
 CNode * CBTree::InsertInRoot(const int nKey, CNode * pLeft, CNode * pRight)
 {
 	CNode* pNode = NULL;
