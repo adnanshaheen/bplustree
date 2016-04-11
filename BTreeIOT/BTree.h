@@ -59,10 +59,19 @@ private:
 	CNode* InsertInParent(const int nKey, CNode* pLeft, CNode* pRight);								/* insert at parent */
 
 	/* Search node */
-	bool Find(int nKey);
-	CNode* Find(CNode* pNode, int nKey);
-	CNode* FindLeaf(int nKey);
-	CNode* FindLeaf(CNode* pNode, int nKey);
+	bool Find(int nKey);																			/* find the key */
+	CNode* Find(CNode* pNode, int nKey);															/* find the key starting from node */
+	CNode* FindLeaf(int nKey);																		/* find a leaf */
+	CNode* FindLeaf(CNode* pNode, int nKey);														/* find a leaf starting from node */
+
+	/* delete node */
+	bool Delete(int nKey);																			/* delete a node */
+	CNode* Delete(CNode* pNode, int nKey);															/* delete a node with key */
+	CNode* DeleteEntry(CNode* pNode, CNode* pRecord, int nKey);										/* delete an entry */
+
+	/* delete the tree */
+	void DeleteTree();																				/* delete the complete tree */
+	void DeleteTree(CNode* pNode);																	/* delete one node */
 
 	/* utility */
 	uint32_t Half() const;

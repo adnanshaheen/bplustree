@@ -3,6 +3,11 @@
 #include "Support.h"
 #include "BTree.h"
 
+/*
+* Constructor
+*
+* Create a node
+*/
 CNode::CNode()
 {
 	m_ppPointer = NULL;
@@ -13,23 +18,41 @@ CNode::CNode()
 	m_pNext = NULL;
 }
 
+/*
+* Destructor
+*
+* Clean all memory for a node
+*/
 CNode::~CNode()
 {
+	delete m_ppPointer;
+	delete m_pKeys;
 }
 
+/*
+ * Constructor
+ *
+ * Create new tree memory
+ */
 CBTree::CBTree()
 {
 }
 
+/*
+ * Destructor
+ *
+ * Clean all memory
+ */
 CBTree::~CBTree()
 {
+	DeleteTree();
 }
 
 /*
-* Insert
-*
-* Insert a new node in tree
-*/
+ * Insert
+ *
+ * Insert a new node in tree
+ */
 CNode * CBTree::Insert(int nKey, int nValue)
 {
 	CNode* pNode = m_pRoot;
@@ -48,10 +71,10 @@ CNode * CBTree::Insert(int nKey, int nValue)
 }
 
 /*
-* Insert
-*
-* Insert a new node in tree - helper function
-*/
+ * Insert
+ *
+ * Insert a new node in tree - helper function
+ */
 CNode * CBTree::Insert(CNode * pNode, int nKey, int nValue)
 {
 	CNode* pNewNode = NULL;
@@ -80,10 +103,10 @@ CNode * CBTree::Insert(CNode * pNode, int nKey, int nValue)
 }
 
 /*
-* NewTree
-*
-* Make a new tree
-*/
+ * NewTree
+ *
+ * Make a new tree
+ */
 CNode * CBTree::NewTree(int nKey, int * pPointer)
 {
 	CNode* pNode = NULL;
@@ -121,10 +144,10 @@ int * CBTree::MakeRecord(int nValue)
 }
 
 /*
-* GetLeftIndex
-*
-* find the left most index
-*/
+ * GetLeftIndex
+ *
+ * find the left most index
+ */
 uint32_t CBTree::GetLeftIndex(CNode * pParent, CNode * pLeft)
 {
 	uint32_t nIndex = 0;
@@ -184,10 +207,10 @@ CNode * CBTree::MakeLeaf()
 }
 
 /*
-* InsertInLeaf
-*
-* Insert a new node in leaf
-*/
+ * InsertInLeaf
+ *
+ * Insert a new node in leaf
+ */
 CNode * CBTree::InsertInLeaf(CNode * pNode, int nKey, int * pPointer)
 {
 	CNode* pResult = NULL;
@@ -214,10 +237,10 @@ CNode * CBTree::InsertInLeaf(CNode * pNode, int nKey, int * pPointer)
 }
 
 /*
-* SplitInsertLeaf
-*
-* Split and then Insert a new node in leaf
-*/
+ * SplitInsertLeaf
+ *
+ * Split and then Insert a new node in leaf
+ */
 CNode * CBTree::SplitInsertLeaf(CNode * pNode, int nKey, int * pPointer)
 {
 	CNode* pNewNode = NULL;
@@ -299,10 +322,10 @@ CNode * CBTree::SplitInsertLeaf(CNode * pNode, int nKey, int * pPointer)
 }
 
 /*
-* InsertInNode
-*
-* Insert a new node
-*/
+ * InsertInNode
+ *
+ * Insert a new node
+ */
 CNode * CBTree::InsertInNode(CNode * pParent, const uint32_t nIndex, const int nKey, CNode * pRight)
 {
 	CNode* pNode = NULL;
@@ -327,10 +350,10 @@ CNode * CBTree::InsertInNode(CNode * pParent, const uint32_t nIndex, const int n
 }
 
 /*
-* SplitInsertNode
-*
-* Split and insert a new node
-*/
+ * SplitInsertNode
+ *
+ * Split and insert a new node
+ */
 CNode * CBTree::SplitInsertNode(CNode * pParent, const uint32_t nIndex, const int nKey, CNode * pRight)
 {
 	CNode* pNode = NULL;
@@ -407,10 +430,10 @@ CNode * CBTree::SplitInsertNode(CNode * pParent, const uint32_t nIndex, const in
 }
 
 /*
-* InsertInRoot
-*
-* insert a new node in root
-*/
+ * InsertInRoot
+ *
+ * insert a new node in root
+ */
 CNode * CBTree::InsertInRoot(const int nKey, CNode * pLeft, CNode * pRight)
 {
 	CNode* pNode = NULL;
@@ -430,10 +453,10 @@ CNode * CBTree::InsertInRoot(const int nKey, CNode * pLeft, CNode * pRight)
 }
 
 /*
-* InsertInParent
-*
-* insert a new node in parent
-*/
+ * InsertInParent
+ *
+ * insert a new node in parent
+ */
 CNode * CBTree::InsertInParent(const int nKey, CNode * pLeft, CNode * pRight)
 {
 	CNode* pNode = NULL;
@@ -456,10 +479,10 @@ CNode * CBTree::InsertInParent(const int nKey, CNode * pLeft, CNode * pRight)
 }
 
 /*
-* Find
-*
-* Find a key
-*/
+ * Find
+ *
+ * Find a key
+ */
 bool CBTree::Find(int nKey)
 {
 	bool bRes = false;
@@ -475,10 +498,10 @@ bool CBTree::Find(int nKey)
 }
 
 /*
-* Find
-*
-* Find a key, starting from CNode
-*/
+ * Find
+ *
+ * Find a key, starting from CNode
+ */
 CNode * CBTree::Find(CNode * pNode, int nKey)
 {
 	try {
@@ -501,10 +524,10 @@ CNode * CBTree::Find(CNode * pNode, int nKey)
 }
 
 /*
-* FindLeaf
-*
-* Find a node with nKey
-*/
+ * FindLeaf
+ *
+ * Find a node with nKey
+ */
 CNode * CBTree::FindLeaf(int nKey)
 {
 	CNode* pNode = NULL;
@@ -522,10 +545,10 @@ CNode * CBTree::FindLeaf(int nKey)
 }
 
 /*
-* FindLeaf
-*
-* Find a node, starting from pNode with nKey
-*/
+ * FindLeaf
+ *
+ * Find a node, starting from pNode with nKey
+ */
 CNode * CBTree::FindLeaf(CNode * pNode, int nKey)
 {
 	try {
@@ -548,14 +571,98 @@ CNode * CBTree::FindLeaf(CNode * pNode, int nKey)
 		std::cerr << ex.what() << std::endl;
 	}
 
+	return pNode;
+}
+
+/*
+ * Delete
+ *
+ * Delete the node
+ */
+bool CBTree::Delete(int nKey)
+{
+	bool bRes = false;
+	try {
+		if (Delete(m_pRoot, nKey))
+			bRes = true;
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+
+	return false;
+}
+
+/*
+ * Delete
+ *
+ * Delete the node
+ */
+CNode * CBTree::Delete(CNode * pNode, int nKey)
+{
+	try {
+		CNode* pRecord = Find(m_pRoot, nKey);
+		CNode* pLeaf = FindLeaf(m_pRoot, nKey);
+		if (pRecord && pLeaf) {
+			pNode = DeleteEntry(pLeaf, pRecord, nKey);
+			delete pRecord;
+		}
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+
 	return nullptr;
 }
 
 /*
-* Half
-*
-* Find the middle of order
-*/
+ * DeleteEntry
+ *
+ * Delete an entry from tree
+ */
+CNode * CBTree::DeleteEntry(CNode * pNode, CNode * pRecord, int nKey)
+{
+	return nullptr;
+}
+
+/*
+ * DeleteTree
+ *
+ * Delete the whole tree
+ */
+void CBTree::DeleteTree()
+{
+	DeleteTree(m_pRoot);
+}
+
+/*
+ * DeleteTree
+ *
+ * Delete the whole tree
+ */
+void CBTree::DeleteTree(CNode * pNode)
+{
+	try {
+		if (pNode) {
+			if (pNode->IsLeaf())
+				for (uint32_t nKey = 0; pNode->m_nKeys; ++nKey)
+					delete pNode->m_ppPointer[nKey];
+			else
+				for (uint32_t nKey = 0; pNode->m_nKeys + 1; ++nKey)
+					DeleteTree((CNode*)pNode->m_ppPointer[nKey]);
+			delete pNode;
+		}
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+}
+
+/*
+ * Half
+ *
+ * Find the middle of order
+ */
 uint32_t CBTree::Half() const
 {
 	if (GetOrder() % 2)
