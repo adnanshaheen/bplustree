@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "Support.h"
 #include "BTree.h"
 
 CNode::CNode()
@@ -33,6 +34,9 @@ CNode * CBTree::Insert(int nKey, int nValue)
 {
 	CNode* pNode = m_pRoot;
 	try {
+		if (GetOrder() < nMinOrder && GetOrder() > nMaxOrder)
+			throw std::exception("Order of tree not supported!!!");
+
 		/* find the node, duplicates are not allowed */
 		if (!Find(nKey))
 			pNode = Insert(m_pRoot, nKey, nValue);
@@ -460,7 +464,7 @@ bool CBTree::Find(int nKey)
 {
 	bool bRes = false;
 	try {
-		if (Find(m_pRoot, nKey))
+		if (m_pRoot != NULL && Find(m_pRoot, nKey))
 			bRes = true;
 	}
 	catch (const std::exception& ex) {
@@ -525,8 +529,11 @@ CNode * CBTree::FindLeaf(int nKey)
 CNode * CBTree::FindLeaf(CNode * pNode, int nKey)
 {
 	try {
-		while (!pNode->IsLeaf()) {
-			int nIndex = 0;
+		if (pNode == NULL)
+			throw std::exception("Invalid parameter!!!");
+
+		while (pNode != NULL && !pNode->IsLeaf()) {
+			uint32_t nIndex = 0;
 			while (nIndex < pNode->m_nKeys) {
 				if (nKey >= pNode->m_pKeys[nIndex])
 					++ nIndex;
