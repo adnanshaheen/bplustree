@@ -705,8 +705,19 @@ CNode * CBTree::RemoveEntry(CNode * pNode, CNode * pRecord, int nKey)
  */
 CNode * CBTree::AdjustRoot()
 {
+	CNode* pNode = NULL;
 	try {
+		if (m_pRoot->m_nKeys > 0)		/* root has space, just return it */
+			pNode = m_pRoot;
+		else {
+			/* no more space in root */
+			if (m_pRoot->IsLeaf()) {
+				pNode = (CNode*) m_pRoot->m_ppPointer[0];		/* set the new root */
+				pNode->m_pParent = NULL;						/* update the parent */
+			}
+		}
 
+		delete m_pRoot;											/* delete root, we have adjusted it */
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
