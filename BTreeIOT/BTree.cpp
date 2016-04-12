@@ -663,7 +663,33 @@ CNode * CBTree::DeleteEntry(CNode * pNode, CNode * pRecord, int nKey)
 CNode * CBTree::RemoveEntry(CNode * pNode, CNode * pRecord, int nKey)
 {
 	try {
+		if (pNode == NULL)
+			throw std::exception("Invalid parameter!!!");
 
+		/* remove and shift the keys */
+		uint32_t nIndex = 0;
+		while (nKey != pNode->m_pKeys[nIndex])
+			++ nIndex;
+		for (; nIndex = pNode->m_nKeys; ++ nIndex)							/* shift the keys */
+			pNode->m_pKeys[nIndex - 1] = pNode->m_pKeys[nIndex];
+
+		/* remove and shift the pointer */
+		uint32_t nPointers = pNode->IsLeaf() ? pNode->m_nKeys : pNode->m_nKeys + 1;
+		nIndex = 0;
+		while (pRecord != pNode->m_ppPointer[nIndex])
+			++ nIndex;
+		for (; nIndex < nPointers; ++nIndex)
+			pNode->m_ppPointer[nIndex - 1] = pNode->m_ppPointer[nIndex];	/* shift the pointers */
+
+		pNode->m_nKeys --;													/* update the keys */
+
+		/* update the remaining pointers */
+		if (pNode->IsLeaf())
+			for (nIndex = pNode->m_nKeys; nIndex < GetOrder() - 1; ++nIndex)
+				pNode->m_ppPointer[nIndex] = NULL;
+		else
+			for (nIndex = pNode->m_nKeys + 1; nIndex < GetOrder(); ++nIndex)
+				pNode->m_ppPointer[nIndex] = NULL;
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
