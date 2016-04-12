@@ -767,7 +767,54 @@ int CBTree::GetNextIndex(CNode * pNode)
 CNode * CBTree::AdjustNodes(CNode * pNode, CNode * pNext, int nMiddle, int nNext)
 {
 	try {
+		if (pNode == NULL || pNext == NULL)
+			throw std::exception("Invalid parameter!!!");
 
+		/* swap the closest node with the node if they are on extreame left and right */
+		if (nNext == -1) {
+			CNode* pTemp = pNode;
+			pNode = pNext;
+			pNext = pTemp;
+		}
+
+		uint32_t nNextKeys = pNext->m_nKeys;
+		if (!pNode->IsLeaf()) {
+			/* not a leaf node */
+			pNext->m_pKeys[nNextKeys] = nMiddle;
+			pNext->m_nKeys ++;
+
+			/* append the keys and pointers to next */
+			uint32_t nIndex = nNextKeys + 1;
+			uint32_t nNodeIndex = 0;
+			for (; nNodeIndex < pNode->m_nKeys;) {
+				pNext->m_pKeys[nIndex ++] = pNode->m_pKeys[nNodeIndex ++];		/* append keys */
+				pNext->m_ppPointer[nIndex] = pNode->m_ppPointer[nNodeIndex];	/* append pointers */
+				pNext->m_nKeys ++;												/* increment keys in next */
+				pNode->m_nKeys --;												/* decrement keys in current */
+			}
+
+			/* we have one more pointer then keys, append that pointer too */
+			pNext->m_ppPointer[nIndex] = pNode->m_ppPointer[nNodeIndex];
+
+			/* set the parent pointer */
+			for (nIndex = 0; nIndex < pNext->m_nKeys + 1; ++ nIndex) {			/* m_nKeys + 1, for last pointer */
+				CNode* pTemp = (CNode*) pNext->m_ppPointer[nIndex];
+				pTemp->m_pParent = pNext;
+			}
+		}
+		else {
+			/* node is a leaf */
+			/* append the keys and pointers to next */
+			uint32_t nIndex = nNextKeys + 1;
+			uint32_t nNodeIndex = 0;
+			for (; nNodeIndex < pNode->m_nKeys;) {
+				pNext->m_pKeys[nIndex ++] = pNode->m_pKeys[nNodeIndex ++];		/* append the keys */
+				pNext->m_ppPointer[nIndex] = pNode->m_ppPointer[nNodeIndex];	/* append the pointers */
+				pNext->m_nKeys ++;												/* increment the keys */
+			}
+			pNext->m_ppPointer[nIndex] = pNode->m_ppPointer[nNodeIndex];		/* copy last pointer */
+		}
+		m_pRoot = DeleteEntry(pNode->m_pParent, pNode, nMiddle);
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
