@@ -25,8 +25,15 @@ CNode::CNode()
 */
 CNode::~CNode()
 {
-	delete m_ppPointer;
-	delete m_pKeys;
+	if (m_ppPointer) {
+		delete m_ppPointer;
+		m_ppPointer = NULL;
+	}
+
+	if (m_pKeys) {
+		delete m_pKeys;
+		m_pKeys = NULL;
+	}
 }
 
 /*
@@ -718,6 +725,7 @@ CNode * CBTree::AdjustRoot()
 		}
 
 		delete m_pRoot;											/* delete root, we have adjusted it */
+		m_pRoot = NULL;
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
@@ -733,14 +741,22 @@ CNode * CBTree::AdjustRoot()
  */
 int CBTree::GetNextIndex(CNode * pNode)
 {
+	int nResult = 0;
 	try {
+		if (pNode == NULL || pNode->m_pParent == NULL)
+			throw std::exception("Invalid parameter!!!");
 
+		for (uint32_t nIndex = 0; nIndex < pNode->m_pParent->m_nKeys; ++ nIndex)
+			if (pNode->m_pParent->m_ppPointer[nIndex] == pNode) {
+				nResult = nIndex - 1;
+				break;
+			}
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
 	}
 
-	return 0;
+	return nResult;
 }
 
 /*
@@ -804,6 +820,7 @@ void CBTree::DeleteTree(CNode * pNode)
 				for (uint32_t nKey = 0; pNode->m_nKeys + 1; ++nKey)
 					DeleteTree((CNode*)pNode->m_ppPointer[nKey]);
 			delete pNode;
+			pNode = NULL;
 		}
 	}
 	catch (const std::exception& ex) {
