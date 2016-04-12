@@ -400,24 +400,25 @@ CNode * CBTree::SplitInsertNode(CNode * pParent, const uint32_t nIndex, const in
 			pParent->m_pKeys[nPrevKeys] = pKeys[nPrevKeys];
 			pParent->IncKeys();
 		}
-		//pParent->m_ppPointer[nPrevKeys] = ppNodePointers[nPrevKeys];
+		pParent->m_ppPointer[nPrevKeys] = ppNodePointers[nPrevKeys];
 
 		pNode = MakeNode();		/* create new node */
 		if (pNode == NULL)
 			throw std::bad_alloc();
 
 		int nMiddleKey = pKeys[nHalf - 1];
-		for (uint32_t nNextKeys = 0; nPrevKeys < GetOrder(); ++ nPrevKeys, ++ nNextKeys) {	/* copy remaining half */
+		uint32_t nNextKeys = 0;
+		for (; nPrevKeys < GetOrder(); ++ nPrevKeys, ++ nNextKeys) {	/* copy remaining half */
 			pNode->m_ppPointer[nNextKeys] = ppNodePointers[nPrevKeys];
 			pNode->m_pKeys[nNextKeys] = pKeys[nPrevKeys];
 			pNode->IncKeys();
 		}
 		pNode->m_pParent = pParent->m_pParent;
-		//pNode->m_ppPointer[nNextKeys] = ppNodePointers->m_ppPointer[nPrevKeys];
+		pNode->m_ppPointer[nNextKeys] = ppNodePointers[nPrevKeys];
 
 		CNode* pChild = NULL;
 		for (uint32_t nNewKeys = 0; nNewKeys < pNode->m_nKeys; ++ nNewKeys) {
-			pChild = (CNode*) pNode->m_ppPointer[nNewKeys];					// FIXME: Use CNode** but not void**
+			pChild = (CNode*) pNode->m_ppPointer[nNewKeys];
 			pChild->m_pParent = pNode;
 		}
 
