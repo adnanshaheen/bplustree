@@ -276,7 +276,7 @@ CNode * CBTree::SplitInsertLeaf(CNode * pNode, int nKey, int * pPointer)
 		pKeys[nIndex] = nKey;
 
 		/* Split in half */
-		uint32_t nHalf = Half();
+		uint32_t nHalf = Half(GetOrder() - 1);
 		pNode->m_nKeys = 0;
 		uint32_t nPrevKeys = 0;
 		for (nPrevKeys = 0; nPrevKeys < nHalf; ++ nPrevKeys) {		/* update the parent pointers and keys */
@@ -385,7 +385,7 @@ CNode * CBTree::SplitInsertNode(CNode * pParent, const uint32_t nIndex, const in
 		pKeys[nIndex] = nKey;
 
 		/* Split in half */
-		uint32_t nHalf = Half();
+		uint32_t nHalf = Half(GetOrder());
 		pParent->m_nKeys = 0;
 		uint32_t nPrevKeys = 0;
 		for (nPrevKeys = 0; nPrevKeys < nHalf - 1; ++ nPrevKeys) {		/* update the parent pointers and keys */
@@ -622,6 +622,122 @@ CNode * CBTree::Delete(CNode * pNode, int nKey)
  */
 CNode * CBTree::DeleteEntry(CNode * pNode, CNode * pRecord, int nKey)
 {
+	CNode* pResult = NULL;
+	try {
+		pNode = RemoveEntry(pNode, pRecord, nKey);		/* remove the pointer and key */
+		if (pNode == m_pRoot)							/* Deletion from root */
+			pResult = AdjustRoot();						/* adjust the root */
+		else {
+			uint32_t nMinKeys = pNode->IsLeaf() ? Half(GetOrder() - 1) : Half(GetOrder()) - 1;
+			if (pNode->m_nKeys >= nMinKeys)				/* there is enough space */
+				pResult = m_pRoot;
+			else {
+				int nNextIndex = GetNextIndex(pNode);							/* find the next node */
+				int nMiddleIndex = nNextIndex == -1 ? 0 : nNextIndex;
+				if (pNode == NULL || pNode->m_pParent == NULL)					/* check if parent is available or not */
+					throw std::exception("Invalid parent!!!");
+
+				int nNewMiddleIndex = pNode->m_pParent->m_pKeys[nMiddleIndex];	/* find the middle for adjustment */
+				CNode* pNext = (CNode*) ((nNextIndex == -1) ?
+					pNode->m_pParent->m_ppPointer[1] : pNode->m_pParent->m_ppPointer[nNextIndex]);
+				uint32_t nCapacity = pNode->IsLeaf() ? GetOrder() : GetOrder() - 1;
+				if (pNext->m_nKeys + pNode->m_nKeys < nCapacity)				/* space is available adjust nodes */
+					pResult = AdjustNodes(pNode, pNext, nNewMiddleIndex, nNextIndex);
+				else															/* distribute the space between two nodes */
+					pResult = DistributeNodes(pNode, pNext, nMiddleIndex, nNewMiddleIndex, nNextIndex);
+			}
+		}
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+
+	return pResult;
+}
+
+/*
+ * RemoveEntry
+ *
+ * Remove key and pointer from node
+ */
+CNode * CBTree::RemoveEntry(CNode * pNode, CNode * pRecord, int nKey)
+{
+	try {
+
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+
+	return nullptr;
+}
+
+/*
+ * AdjustRoot
+ *
+ * adjust the root, if there is any deletion from root
+ */
+CNode * CBTree::AdjustRoot()
+{
+	try {
+
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+
+	return nullptr;
+}
+
+/*
+ * GetNextIndex
+ *
+ * Get the index of closest node
+ */
+int CBTree::GetNextIndex(CNode * pNode)
+{
+	try {
+
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+
+	return 0;
+}
+
+/*
+ * AdjustNodes
+ *
+ * If a node become too small after deletion, adjust with closest node
+ */
+CNode * CBTree::AdjustNodes(CNode * pNode, CNode * pNext, int nMiddle, int nNext)
+{
+	try {
+
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+
+	return nullptr;
+}
+
+/*
+ * DistributeNodes
+ *
+ * If a node become too small and closest one is too big
+ * Just distribute the nodes amongst two nodes
+ */
+CNode * CBTree::DistributeNodes(CNode * pNode, CNode * pNext, int nMiddle, int nNewMiddle, int nNext)
+{
+	try {
+
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
+
 	return nullptr;
 }
 
@@ -663,10 +779,10 @@ void CBTree::DeleteTree(CNode * pNode)
  *
  * Find the middle of order
  */
-uint32_t CBTree::Half() const
+uint32_t CBTree::Half(uint32_t nOrder) const
 {
-	if (GetOrder() % 2)
-		return GetOrder() / 2;
-	return GetOrder() / 2 + 1;
+	if (nOrder % 2)
+		return nOrder / 2;
+	return nOrder / 2 + 1;
 }
 

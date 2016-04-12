@@ -68,11 +68,16 @@ private:
 	bool Delete(int nKey);																			/* delete a node */
 	CNode* Delete(CNode* pNode, int nKey);															/* delete a node with key */
 	CNode* DeleteEntry(CNode* pNode, CNode* pRecord, int nKey);										/* delete an entry */
+	CNode* RemoveEntry(CNode* pNode, CNode* pRecord, int nKey);										/* remove an entry from node */
+	CNode* AdjustRoot();																			/* adjust the root */
+	int GetNextIndex(CNode* pNode);																	/* get next index */
+	CNode* AdjustNodes(CNode* pNode, CNode* pNext, int nMiddle, int nNext);							/* adjust the nodes, if they are too small */
+	CNode* DistributeNodes(CNode* pNode, CNode* pNext, int nMiddle, int nNewMiddle, int nNext);		/* distribute the nodes across two nodes */
 
 	/* delete the tree */
 	void DeleteTree();																				/* delete the complete tree */
 	void DeleteTree(CNode* pNode);																	/* delete one node */
 
 	/* utility */
-	uint32_t Half() const;
+	uint32_t Half(uint32_t nOrder) const;
 };
