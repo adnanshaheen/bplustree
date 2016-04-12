@@ -457,7 +457,7 @@ CNode * CBTree::InsertInRoot(const int nKey, CNode * pLeft, CNode * pRight)
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
 	}
-	return nullptr;
+	return m_pRoot;
 }
 
 /*
@@ -483,7 +483,7 @@ CNode * CBTree::InsertInParent(const int nKey, CNode * pLeft, CNode * pRight)
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
 	}
-	return nullptr;
+	return pNode;
 }
 
 /*
@@ -620,7 +620,7 @@ CNode * CBTree::Delete(CNode * pNode, int nKey)
 		std::cerr << ex.what() << std::endl;
 	}
 
-	return nullptr;
+	return m_pRoot;
 }
 
 /*
@@ -703,7 +703,7 @@ CNode * CBTree::RemoveEntry(CNode * pNode, CNode * pRecord, int nKey)
 		std::cerr << ex.what() << std::endl;
 	}
 
-	return nullptr;
+	return pNode;
 }
 
 /*
@@ -732,7 +732,7 @@ CNode * CBTree::AdjustRoot()
 		std::cerr << ex.what() << std::endl;
 	}
 
-	return nullptr;
+	return pNode;
 }
 
 /*
@@ -816,12 +816,14 @@ CNode * CBTree::AdjustNodes(CNode * pNode, CNode * pNext, int nMiddle, int nNext
 			pNext->m_ppPointer[nIndex] = pNode->m_ppPointer[nNodeIndex];		/* copy last pointer */
 		}
 		m_pRoot = DeleteEntry(pNode->m_pParent, pNode, nMiddle);
+		delete pNode;
+		pNode = NULL;
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
 	}
 
-	return nullptr;
+	return m_pRoot;
 }
 
 /*
@@ -833,13 +835,66 @@ CNode * CBTree::AdjustNodes(CNode * pNode, CNode * pNext, int nMiddle, int nNext
 CNode * CBTree::DistributeNodes(CNode * pNode, CNode * pNext, int nMiddle, int nNewMiddle, int nNext)
 {
 	try {
+		if (pNode == NULL || pNext == NULL)
+			throw std::exception("Invalid parameter!!!");
 
+		/* Node has a next available node to left */
+		if (nNext != -1) {
+			/* Pull the next last key and pointer pair over from the next right end to node left end */
+			if (!pNode->IsLeaf())
+				pNode->m_ppPointer[pNode->m_nKeys + 1] = pNode->m_ppPointer[pNode->m_nKeys];
+
+			for (uint32_t nIndex = pNode->m_nKeys; nIndex > 0; ++nIndex) {
+				pNode->m_pKeys[nIndex] = pNode->m_pKeys[nIndex - 1];
+				pNode->m_ppPointer[nIndex] = pNode->m_ppPointer[nIndex - 1];
+			}
+
+			if (!pNode->IsLeaf()) {			/* this isn't leaf node */
+				pNode->m_ppPointer[0] = pNext->m_ppPointer[pNext->m_nKeys];					/* set the next pointer */
+				CNode* pTemp = (CNode*) pNode->m_ppPointer[0];
+				pTemp->m_pParent = pNode;													/* set parent */
+				pNext->m_ppPointer[pNext->m_nKeys] = NULL;									/* unset the last pointer */
+				pNode->m_pKeys[0] = nNewMiddle;												/* set the new key */
+				pNode->m_pParent->m_pKeys[nMiddle] = pNext->m_pKeys[pNext->m_nKeys - 1];	/* set the parent's key */
+			}
+			else {							/* this is the leaf */
+				pNode->m_ppPointer[0] = pNext->m_ppPointer[pNext->m_nKeys - 1];				/* set the next pointer */
+				pNext->m_ppPointer[pNext->m_nKeys - 1] = NULL;								/* unset the last pointer */
+				pNode->m_pKeys[0] = pNext->m_pKeys[pNext->m_nKeys - 1];						/* set the new key */
+				pNode->m_pParent->m_pKeys[nMiddle] = pNext->m_pKeys[0];						/* set the parent's key */
+			}
+		}
+		else {			/* node is the left most child */
+			if (pNode->IsLeaf()) {		/* node is a leaf */
+				pNode->m_pKeys[pNode->m_nKeys] = pNext->m_pKeys[0];							/* set the node key */
+				pNode->m_ppPointer[pNode->m_nKeys] = pNext->m_ppPointer[0];					/* set the node pointer */
+				pNode->m_pParent->m_pKeys[nMiddle] = pNext->m_pKeys[1];						/* set the parent key middle */
+			}
+			else {						/* node isn't a leaf */
+				pNode->m_pKeys[pNode->m_nKeys] = nNewMiddle;								/* set the node key */
+				pNode->m_ppPointer[pNode->m_nKeys + 1] = pNext->m_ppPointer[0];				/* set the node pointer */
+				CNode* pTemp = (CNode*) pNode->m_ppPointer[pNode->m_nKeys + 1];
+				pTemp->m_pParent = pNode;
+				pNode->m_pParent->m_pKeys[nMiddle] = pNext->m_pKeys[0];						/* set the parent key */
+			}
+
+			uint32_t nIndex = 0;
+			for (; nIndex < pNext->m_nKeys - 1; ++ nIndex) {
+				pNext->m_pKeys[nIndex] = pNext->m_pKeys[nIndex + 1];						/* shift the keys */
+				pNext->m_ppPointer[nIndex] = pNext->m_ppPointer[nIndex + 1];				/* shift the pointer */
+			}
+			if (!pNode->IsLeaf())
+				pNext->m_ppPointer[nIndex] = pNext->m_ppPointer[nIndex + 1];				/* this isn't leaf, copy last pointer */
+		}
+
+		pNode->m_nKeys ++;			/* node added a key */
+		pNext->m_nKeys --;			/* next lost a key */
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
 	}
 
-	return nullptr;
+	return m_pRoot;
 }
 
 /*
