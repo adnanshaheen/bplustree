@@ -693,7 +693,8 @@ CNode * CBTree::RemoveEntry(CNode * pNode, void * pRecord, int nKey)
 		uint32_t nIndex = 0;
 		while (nKey != pNode->m_pKeys[nIndex])
 			++ nIndex;
-		for (; nIndex = pNode->m_nKeys; ++ nIndex)							/* shift the keys */
+		++ nIndex;															/* We need to copy the remaining keys, not this */
+		for (; nIndex < pNode->m_nKeys; ++ nIndex)							/* shift the keys */
 			pNode->m_pKeys[nIndex - 1] = pNode->m_pKeys[nIndex];
 
 		/* remove and shift the pointer */
@@ -701,6 +702,7 @@ CNode * CBTree::RemoveEntry(CNode * pNode, void * pRecord, int nKey)
 		nIndex = 0;
 		while (pRecord != pNode->m_ppPointer[nIndex])
 			++ nIndex;
+		++ nIndex;															/* We need to copy the remaining pointers, not this */
 		for (; nIndex < nPointers; ++nIndex)
 			pNode->m_ppPointer[nIndex - 1] = pNode->m_ppPointer[nIndex];	/* shift the pointers */
 
@@ -708,10 +710,10 @@ CNode * CBTree::RemoveEntry(CNode * pNode, void * pRecord, int nKey)
 
 		/* update the remaining pointers */
 		if (pNode->IsLeaf())
-			for (nIndex = pNode->m_nKeys; nIndex < GetOrder() - 1; ++nIndex)
+			for (nIndex = pNode->m_nKeys; nIndex < GetOrder() - 1; ++ nIndex)
 				pNode->m_ppPointer[nIndex] = NULL;
 		else
-			for (nIndex = pNode->m_nKeys + 1; nIndex < GetOrder(); ++nIndex)
+			for (nIndex = pNode->m_nKeys + 1; nIndex < GetOrder(); ++ nIndex)
 				pNode->m_ppPointer[nIndex] = NULL;
 	}
 	catch (const std::exception& ex) {
@@ -734,14 +736,16 @@ CNode * CBTree::AdjustRoot()
 			pNode = m_pRoot;
 		else {
 			/* no more space in root */
-			if (m_pRoot->IsLeaf()) {
-				pNode = (CNode*) m_pRoot->m_ppPointer[0];		/* set the new root */
+			if (!m_pRoot->IsLeaf()) {
+				pNode = (CNode*)m_pRoot->m_ppPointer[0];		/* set the new root */
 				pNode->m_pParent = NULL;						/* update the parent */
 			}
-		}
+			else
+				pNode = NULL;
 
-		delete m_pRoot;											/* delete root, we have adjusted it */
-		m_pRoot = NULL;
+			delete m_pRoot;										/* delete root, we have adjusted it */
+			m_pRoot = NULL;
+		}
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;

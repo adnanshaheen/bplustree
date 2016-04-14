@@ -14,6 +14,8 @@ int main()
 	cBTreeObj.Insert(40, 40);
 	cBTreeObj.Insert(30, 30);
 	cBTreeObj.Find(10);
+	cBTreeObj.Delete(10);
+	cBTreeObj.Delete(20);
 
 	return 0;
 }

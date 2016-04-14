@@ -44,7 +44,10 @@ public:
 	bool Insert(int nKey, int nValue);
 
 	/* Find a node */
-	bool Find(int nKey);																			/* find the key */
+	bool Find(int nKey);
+
+	/* Delete a node */
+	bool Delete(int nKey);
 
 private:
 	/* Insert node */
@@ -67,7 +70,6 @@ private:
 	CNode* FindLeaf(CNode* pNode, int nKey);														/* find a leaf starting from node */
 
 	/* delete node */
-	bool Delete(int nKey);																			/* delete a node */
 	CNode* Delete(CNode* pNode, int nKey);															/* delete a node with key */
 	CNode* DeleteEntry(CNode* pNode, void* pRecord, int nKey);										/* delete an entry */
 	CNode* RemoveEntry(CNode* pNode, void* pRecord, int nKey);										/* remove an entry from node */
