@@ -456,13 +456,14 @@ CNode * CBTree::InsertInRoot(const int nKey, CNode * pLeft, CNode * pRight)
 {
 	CNode* pNode = NULL;
 	try {
-		pNode = MakeNode();
-		pNode->m_pKeys[0] = nKey;
-		pNode->m_ppPointer[0] = pLeft;
-		pNode->m_ppPointer[1] = pRight;
-		pNode->IncKeys();
-		pLeft->m_pParent = pNode;
-		pRight->m_pParent = pNode;
+		pNode = MakeNode();					/* make a new node */
+		pNode->m_pKeys[0] = nKey;			/* copy the key value */
+		pNode->m_ppPointer[0] = pLeft;		/* set the left child */
+		pNode->m_ppPointer[1] = pRight;		/* set the right child */
+		pNode->IncKeys();					/* increment the keys */
+		pLeft->m_pParent = pNode;			/* set the parent for left */
+		pRight->m_pParent = pNode;			/* set the parent for right */
+		pLeft->m_pNext = pRight;			/* set the right as next */
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
