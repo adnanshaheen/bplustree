@@ -62,19 +62,19 @@ CBTree::~CBTree()
  */
 CNode * CBTree::Insert(int nKey, int nValue)
 {
-	CNode* pNode = m_pRoot;
 	try {
 		if (GetOrder() < nMinOrder && GetOrder() > nMaxOrder)
 			throw std::exception("Order of tree not supported!!!");
 
 		/* find the node, duplicates are not allowed */
 		if (!Find(nKey))
-			pNode = Insert(m_pRoot, nKey, nValue);
+			m_pRoot = Insert(m_pRoot, nKey, nValue);
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
 	}
-	return pNode;
+
+	return m_pRoot;
 }
 
 /*
@@ -92,15 +92,16 @@ CNode * CBTree::Insert(CNode * pNode, int nKey, int nValue)
 
 		if (pNode == NULL)								/* create new tree */
 			pNewNode = NewTree(nKey, pPointer);
-
-		CNode* pLeaf = FindLeaf(nKey);					/* find the leaf node */
-		if (pLeaf == NULL)
-			throw std::bad_alloc();
-
-		if (pLeaf->m_nKeys > GetOrder() - 1)			/* space is available, insert here */
-			pLeaf = InsertInLeaf(pLeaf, nKey, pPointer);
 		else {
-			pNewNode = SplitInsertLeaf(pLeaf, nKey, pPointer);
+			CNode* pLeaf = FindLeaf(nKey);					/* find the leaf node */
+			if (pLeaf == NULL)								/* FIXME: ...*/
+				throw std::exception("Couldn't find a leaf");
+
+			if (pLeaf->m_nKeys < GetOrder() - 1)			/* space is available, insert here */
+				pLeaf = InsertInLeaf(pLeaf, nKey, pPointer);
+			else {
+				pNewNode = SplitInsertLeaf(pLeaf, nKey, pPointer);
+			}
 		}
 	}
 	catch (const std::exception& ex) {
@@ -177,7 +178,7 @@ CNode * CBTree::MakeNode()
 {
 	CNode* pNode = NULL;
 	try {
-		pNode = new CNode();						/* create a new node */
+		pNode = new CNode();							/* create a new node */
 		if (pNode == NULL)
 			throw std::bad_alloc();
 
@@ -185,9 +186,13 @@ CNode * CBTree::MakeNode()
 		if (pNode->m_pKeys == NULL)
 			throw std::bad_alloc();
 
+		memset(pNode->m_pKeys, 0, sizeof(int) * (GetOrder() - 1));		/* set all keys to zero */
+
 		pNode->m_ppPointer = new void*[GetOrder()];		/* create pointers */
 		if (pNode->m_ppPointer == NULL)
 			throw std::bad_alloc();
+
+		memset(pNode->m_ppPointer, 0, GetOrder() * sizeof(void*));
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
@@ -220,13 +225,12 @@ CNode * CBTree::MakeLeaf()
  */
 CNode * CBTree::InsertInLeaf(CNode * pNode, int nKey, int * pPointer)
 {
-	CNode* pResult = NULL;
 	try {
 		uint32_t nPos = 0;
 		while (nPos < pNode->m_nKeys && pNode->m_pKeys[nPos] < nKey)			/* find the position to insert in leaf */
 			++ nPos;
 
-		for (uint32_t nKeyPos = pNode->m_nKeys; nKeyPos > nPos; ++ nKeyPos) {	/* adjust the previous keys and pointers */
+		for (uint32_t nKeyPos = pNode->m_nKeys; nKeyPos > nPos; -- nKeyPos) {	/* adjust the previous keys and pointers */
 			pNode->m_pKeys[nKeyPos] = pNode->m_pKeys[nKeyPos - 1];
 			pNode->m_ppPointer[nKeyPos] = pNode->m_ppPointer[nKeyPos - 1];
 		}
@@ -240,7 +244,7 @@ CNode * CBTree::InsertInLeaf(CNode * pNode, int nKey, int * pPointer)
 		std::cerr << ex.what() << std::endl;
 	}
 
-	return pResult;
+	return pNode;
 }
 
 /*
