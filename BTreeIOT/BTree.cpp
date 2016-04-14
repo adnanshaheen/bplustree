@@ -97,8 +97,10 @@ CNode * CBTree::Insert(CNode * pNode, int nKey, int nValue)
 			if (pLeaf == NULL)								/* FIXME: ...*/
 				throw std::exception("Couldn't find a leaf");
 
-			if (pLeaf->m_nKeys < GetOrder() - 1)			/* space is available, insert here */
+			if (pLeaf->m_nKeys < GetOrder() - 1) {			/* space is available, insert here */
 				pLeaf = InsertInLeaf(pLeaf, nKey, pPointer);
+				pNewNode = pNode;
+			}
 			else {
 				pNewNode = SplitInsertLeaf(pLeaf, nKey, pPointer);
 			}
@@ -263,9 +265,13 @@ CNode * CBTree::SplitInsertLeaf(CNode * pNode, int nKey, int * pPointer)
 		if (ppNodePointers == NULL)
 			throw std::bad_alloc();
 
+		memset(ppNodePointers, 0, sizeof(void*) * GetOrder());		/* set all keys to zero */
+
 		int* pKeys = new int[GetOrder()];					/* create temporary keys */
 		if (pKeys == NULL)
 			throw std::bad_alloc();
+
+		memset(pKeys, 0, sizeof(int) * GetOrder());			/* set all keys to zero */
 
 		uint32_t nIndex = 0;
 		while (nIndex < GetOrder() - 1 && pNode->m_pKeys[nIndex] < nKey)
