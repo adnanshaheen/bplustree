@@ -62,15 +62,15 @@ private:
 	CNode* InsertInParent(const int nKey, CNode* pLeft, CNode* pRight);								/* insert at parent */
 
 	/* Search node */
-	CNode* Find(CNode* pNode, int nKey);															/* find the key starting from node */
+	int* Find(CNode* pNode, int nKey);															/* find the key starting from node */
 	CNode* FindLeaf(int nKey);																		/* find a leaf */
 	CNode* FindLeaf(CNode* pNode, int nKey);														/* find a leaf starting from node */
 
 	/* delete node */
 	bool Delete(int nKey);																			/* delete a node */
 	CNode* Delete(CNode* pNode, int nKey);															/* delete a node with key */
-	CNode* DeleteEntry(CNode* pNode, CNode* pRecord, int nKey);										/* delete an entry */
-	CNode* RemoveEntry(CNode* pNode, CNode* pRecord, int nKey);										/* remove an entry from node */
+	CNode* DeleteEntry(CNode* pNode, void* pRecord, int nKey);										/* delete an entry */
+	CNode* RemoveEntry(CNode* pNode, void* pRecord, int nKey);										/* remove an entry from node */
 	CNode* AdjustRoot();																			/* adjust the root */
 	int GetNextIndex(CNode* pNode);																	/* get next index */
 	CNode* AdjustNodes(CNode* pNode, CNode* pNext, int nMiddle, int nNext);							/* adjust the nodes, if they are too small */

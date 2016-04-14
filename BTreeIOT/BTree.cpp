@@ -524,8 +524,9 @@ bool CBTree::Find(int nKey)
  *
  * Find a key, starting from CNode
  */
-CNode * CBTree::Find(CNode * pNode, int nKey)
+int * CBTree::Find(CNode * pNode, int nKey)
 {
+	int* pRes = NULL;
 	try {
 		pNode = FindLeaf(pNode, nKey);
 		if (pNode != NULL) {
@@ -534,15 +535,15 @@ CNode * CBTree::Find(CNode * pNode, int nKey)
 				if (pNode->m_pKeys[nIndex] == nKey)
 					break;
 			if (nIndex == pNode->m_nKeys)
-				pNode = NULL;
+				pRes = NULL;
 			else
-				pNode = (CNode*) pNode->m_ppPointer[nIndex];
+				pRes = (int*) pNode->m_ppPointer[nIndex];
 		}
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
 	}
-	return pNode;
+	return pRes;
 }
 
 /*
@@ -623,7 +624,7 @@ bool CBTree::Delete(int nKey)
 CNode * CBTree::Delete(CNode * pNode, int nKey)
 {
 	try {
-		CNode* pRecord = Find(m_pRoot, nKey);
+		int* pRecord = Find(m_pRoot, nKey);
 		CNode* pLeaf = FindLeaf(m_pRoot, nKey);
 		if (pRecord && pLeaf) {
 			pNode = DeleteEntry(pLeaf, pRecord, nKey);
@@ -642,7 +643,7 @@ CNode * CBTree::Delete(CNode * pNode, int nKey)
  *
  * Delete an entry from tree
  */
-CNode * CBTree::DeleteEntry(CNode * pNode, CNode * pRecord, int nKey)
+CNode * CBTree::DeleteEntry(CNode * pNode, void * pRecord, int nKey)
 {
 	CNode* pResult = NULL;
 	try {
@@ -682,7 +683,7 @@ CNode * CBTree::DeleteEntry(CNode * pNode, CNode * pRecord, int nKey)
  *
  * Remove key and pointer from node
  */
-CNode * CBTree::RemoveEntry(CNode * pNode, CNode * pRecord, int nKey)
+CNode * CBTree::RemoveEntry(CNode * pNode, void * pRecord, int nKey)
 {
 	try {
 		if (pNode == NULL)
