@@ -60,21 +60,24 @@ CBTree::~CBTree()
  *
  * Insert a new node in tree
  */
-CNode * CBTree::Insert(int nKey, int nValue)
+bool CBTree::Insert(int nKey, int nValue)
 {
+	bool bRes = false;
 	try {
 		if (GetOrder() < nMinOrder && GetOrder() > nMaxOrder)
 			throw std::exception("Order of tree not supported!!!");
 
 		/* find the node, duplicates are not allowed */
-		if (!Find(nKey))
+		if (!Find(nKey)) {
 			m_pRoot = Insert(m_pRoot, nKey, nValue);
+			bRes = true;
+		}
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
 	}
 
-	return m_pRoot;
+	return bRes;
 }
 
 /*

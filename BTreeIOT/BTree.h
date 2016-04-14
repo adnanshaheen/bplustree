@@ -41,7 +41,10 @@ public:
 	inline void SetOrder(const uint32_t uOrder) { m_uOrder = uOrder; }
 
 	/* Insert a node */
-	CNode* Insert(int nKey, int nValue);
+	bool Insert(int nKey, int nValue);
+
+	/* Find a node */
+	bool Find(int nKey);																			/* find the key */
 
 private:
 	/* Insert node */
@@ -59,7 +62,6 @@ private:
 	CNode* InsertInParent(const int nKey, CNode* pLeft, CNode* pRight);								/* insert at parent */
 
 	/* Search node */
-	bool Find(int nKey);																			/* find the key */
 	CNode* Find(CNode* pNode, int nKey);															/* find the key starting from node */
 	CNode* FindLeaf(int nKey);																		/* find a leaf */
 	CNode* FindLeaf(CNode* pNode, int nKey);														/* find a leaf starting from node */
