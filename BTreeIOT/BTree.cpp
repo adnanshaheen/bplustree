@@ -466,7 +466,7 @@ CNode * CBTree::InsertInRoot(const int nKey, CNode * pLeft, CNode * pRight)
 		pNode->IncKeys();					/* increment the keys */
 		pLeft->m_pParent = pNode;			/* set the parent for left */
 		pRight->m_pParent = pNode;			/* set the parent for right */
-		pLeft->m_pNext = pRight;			/* set the right as next */
+		//pLeft->m_pNext = pRight;			/* set the right as next */
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
@@ -493,6 +493,17 @@ CNode * CBTree::InsertInParent(const int nKey, CNode * pLeft, CNode * pRight)
 			pNode = InsertInNode(pParent, GetLeftIndex(pParent, pLeft), nKey, pRight);		/* insert in the same node */
 		else
 			pNode = SplitInsertNode(pParent, GetLeftIndex(pParent, pLeft), nKey, pRight);	/* insert in splitted node */
+
+		if (pLeft != NULL && pRight != NULL && pLeft->IsLeaf() && pRight->IsLeaf()) {
+			for (uint32_t nIndex = 0; nIndex < pNode->m_nKeys && pParent; ++nIndex) {
+				CNode* pTemp = (CNode*) pParent->m_ppPointer[nIndex];
+				if (pTemp && pTemp->m_pNext)
+					pTemp->m_pNext = NULL;
+			}
+
+			if (nKey == pLeft->m_pKeys[pLeft->m_nKeys - 1] || nKey == pRight->m_pKeys[0])
+				pLeft->m_pNext = pRight;
+		}
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
