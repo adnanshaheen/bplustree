@@ -299,13 +299,13 @@ CNode * CBTree::SplitInsertLeaf(CNode * pNode, int nKey, int * pPointer)
 		uint32_t nHalf = Half(GetOrder() - 1);
 		pNode->m_nKeys = 0;
 		uint32_t nPrevKeys = 0;
-		for (nPrevKeys = 0; nPrevKeys < nHalf; ++ nPrevKeys) {		/* update the parent pointers and keys */
+		for (nPrevKeys = 0; nPrevKeys < nHalf; ++ nPrevKeys) {		/* update the previous pointers and keys */
 			pNode->m_ppPointer[nPrevKeys] = ppNodePointers[nPrevKeys];
 			pNode->m_pKeys[nPrevKeys] = pKeys[nPrevKeys];
 			pNode->IncKeys();
 		}
 
-		pNewNode = MakeNode();		/* create new node */
+		pNewNode = MakeLeaf();		/* create new node */
 		if (pNewNode == NULL)
 			throw std::bad_alloc();
 
@@ -471,7 +471,7 @@ CNode * CBTree::InsertInRoot(const int nKey, CNode * pLeft, CNode * pRight)
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
 	}
-	return m_pRoot;
+	return pNode;
 }
 
 /*
@@ -957,7 +957,7 @@ void CBTree::DeleteTree(CNode * pNode)
  */
 uint32_t CBTree::Half(uint32_t nOrder) const
 {
-	if (nOrder % 2)
+	if (nOrder % 2 == 0)
 		return nOrder / 2;
 	return nOrder / 2 + 1;
 }
