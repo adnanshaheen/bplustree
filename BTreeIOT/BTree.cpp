@@ -836,14 +836,14 @@ CNode * CBTree::AdjustNodes(CNode * pNode, CNode * pNext, int nMiddle, int nNext
 		else {
 			/* node is a leaf */
 			/* append the keys and pointers to next */
-			uint32_t nIndex = nNextKeys + 1;
+			uint32_t nIndex = nNextKeys;
 			uint32_t nNodeIndex = 0;
 			for (; nNodeIndex < pNode->m_nKeys;) {
-				pNext->m_pKeys[nIndex ++] = pNode->m_pKeys[nNodeIndex ++];		/* append the keys */
-				pNext->m_ppPointer[nIndex] = pNode->m_ppPointer[nNodeIndex];	/* append the pointers */
-				pNext->m_nKeys ++;												/* increment the keys */
+				pNext->m_pKeys[nIndex] = pNode->m_pKeys[nNodeIndex];				/* append the keys */
+				pNext->m_ppPointer[nIndex ++] = pNode->m_ppPointer[nNodeIndex ++];	/* append the pointers */
+				pNext->m_nKeys ++;													/* increment the keys */
 			}
-			pNext->m_ppPointer[nIndex] = pNode->m_ppPointer[nNodeIndex];		/* copy last pointer */
+			pNext->m_ppPointer[GetOrder() - 1] = pNode->m_ppPointer[GetOrder() - 1];		/* copy last pointer */
 		}
 		m_pRoot = DeleteEntry(pNode->m_pParent, pNode, nMiddle);
 		delete pNode;
