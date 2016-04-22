@@ -495,14 +495,17 @@ CNode * CBTree::InsertInParent(const int nKey, CNode * pLeft, CNode * pRight)
 			pNode = SplitInsertNode(pParent, GetLeftIndex(pParent, pLeft), nKey, pRight);	/* insert in splitted node */
 
 		if (pLeft != NULL && pRight != NULL && pLeft->IsLeaf() && pRight->IsLeaf()) {
-			for (uint32_t nIndex = 0; nIndex < pNode->m_nKeys && pParent; ++nIndex) {
-				CNode* pTemp = (CNode*) pParent->m_ppPointer[nIndex];
-				if (pTemp && pTemp->m_pNext)
-					pTemp->m_pNext = NULL;
-			}
 
-			if (nKey == pLeft->m_pKeys[pLeft->m_nKeys - 1] || nKey == pRight->m_pKeys[0])
+			if (nKey == pLeft->m_pKeys[pLeft->m_nKeys - 1] || nKey == pRight->m_pKeys[0]) {
 				pLeft->m_pNext = pRight;
+
+				/* reset the next pointer for the left, in case any previous one */
+				for (uint32_t nIndex = 0; nIndex < pLeft->m_nKeys - 1 && pParent; ++ nIndex) {
+					CNode* pTemp = (CNode*) pParent->m_ppPointer[nIndex];
+					if (pTemp && pTemp->m_pNext)
+						pTemp->m_pNext = NULL;
+				}
+			}
 		}
 	}
 	catch (const std::exception& ex) {
@@ -971,23 +974,18 @@ void CBTree::DeleteTree(CNode * pNode)
 
 void CBTree::PrintTree(CNode * pNode)
 {
-	if (pNode) {
-		if (!pNode->IsLeaf()) {
-			for (size_t nKey = 0; nKey < pNode->m_nKeys && pNode->m_pKeys[nKey] != NULL; ++ nKey)
-				std::cout << pNode->m_pKeys[nKey] << " ";
-			std::cout << std::endl;
-			for (size_t nKey = 0; nKey < pNode->m_nKeys + 1; ++ nKey) {
-				PrintTree(reinterpret_cast<CNode*> (pNode->m_ppPointer[nKey]));
-			}
+	while (pNode && !pNode->IsLeaf()) {
+		if (pNode->m_nKeys > 0)
+			pNode = reinterpret_cast<CNode*> (pNode->m_ppPointer[0]);
+	}
+
+	while (pNode && pNode->IsLeaf()) {
+		for (size_t nKey = 0; nKey < pNode->m_nKeys; ++nKey) {
+			int* nValue = (int*)pNode->m_ppPointer[nKey];
+			std::cout << "| " << *nValue << " |";
 		}
-		else {
-			std::cout << "Node node!!!" << std::endl;
-			for (size_t nKey = 0; nKey < pNode->m_nKeys; ++nKey) {
-				int* nValue = (int*) pNode->m_ppPointer[nKey];
-				std::cout << *nValue << " ";
-			}
-			std::cout << std::endl;
-		}
+		std::cout << " | ";
+		pNode = pNode->m_pNext;
 	}
 }
 
