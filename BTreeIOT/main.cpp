@@ -67,6 +67,7 @@ int main(int argc, char* argv[])
 			std::cout << "insert key" << std::endl;
 			std::cout << "delete key" << std::endl;
 			std::cout << "select key" << std::endl;
+			std::cout << "print" << std::endl;
 			std::cout << "exit" << std::endl;
 			std::cout << std::endl;
 
@@ -91,6 +92,9 @@ int main(int argc, char* argv[])
 				Opts.nKEY = atoi(csCommand.substr(nIndex).c_str());
 				Opts.eCommand = eInsert;
 			}
+			else if (_strnicmp(csCommand.c_str(), "print", strlen("print")) == 0) {
+				Opts.eCommand = ePrint;
+			}
 			else if (_strnicmp(csCommand.c_str(), "exit", strlen("exit")) == 0)
 				break;
 			else {
@@ -105,19 +109,12 @@ int main(int argc, char* argv[])
 			cBTreeObj.Delete(Opts.nKEY);
 		else if (Opts.eCommand == eSelect)				/* select command */
 			cBTreeObj.Find(Opts.nKEY);
+		else if (Opts.eCommand == ePrint)
+			cBTreeObj.PrintTree();
 
 		Opts.eCommand = eNone;							/* reset the command, to get next command */
 
 	}
-#ifdef _DEBUG
-	cBTreeObj.Insert(20, 20);
-	cBTreeObj.Insert(20, 20);
-	cBTreeObj.Insert(10, 10);
-	cBTreeObj.Insert(40, 40);
-	cBTreeObj.Insert(30, 30);
-	cBTreeObj.Find(10);
-	cBTreeObj.Delete(10);
-	cBTreeObj.Delete(20);
-#endif // _DEBUG
+
 	return 0;
 }

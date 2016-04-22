@@ -8,6 +8,7 @@ enum eCOMMANDS {
 	eSelect = 0x0001,		/* select command */
 	eInsert = 0x0002,		/* insert command */
 	eDelete = 0x0004,		/* delete command */
+	ePrint = 0x0008,		/* print tree command */
 };
 struct OPTIONS {
 	uint32_t nOrder;		/* order of B+Tree */

@@ -7,7 +7,7 @@
 class CNode
 {
 public:
-	void** m_ppPointer;		/* N-number of pointers */ /* FIXME: Change it to CNode** */
+	void** m_ppPointer;		/* N-number of pointers */
 	int* m_pKeys;			/* N-1 number of keys */
 	uint32_t m_nKeys;		/* key values */
 	bool m_bLeaf;			/* Is leaf node */
@@ -49,6 +49,8 @@ public:
 	/* Delete a node */
 	bool Delete(int nKey);
 
+	void PrintTree();
+
 private:
 	/* Insert node */
 	CNode* Insert(CNode* pNode, int nKey, int nValue);												/* insert helper */
@@ -81,6 +83,9 @@ private:
 	/* delete the tree */
 	void DeleteTree();																				/* delete the complete tree */
 	void DeleteTree(CNode* pNode);																	/* delete one node */
+
+	/* display */
+	void PrintTree(CNode* pNode);
 
 	/* utility */
 	uint32_t Half(uint32_t nOrder) const;

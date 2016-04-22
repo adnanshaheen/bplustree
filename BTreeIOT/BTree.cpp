@@ -627,6 +627,14 @@ bool CBTree::Delete(int nKey)
 	return false;
 }
 
+void CBTree::PrintTree()
+{
+	if (m_pRoot == NULL)
+		std::cout << "Empty tree" << std::endl;
+	else
+		PrintTree(m_pRoot);
+}
+
 /*
  * Delete
  *
@@ -958,6 +966,28 @@ void CBTree::DeleteTree(CNode * pNode)
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;
+	}
+}
+
+void CBTree::PrintTree(CNode * pNode)
+{
+	if (pNode) {
+		if (!pNode->IsLeaf()) {
+			for (size_t nKey = 0; nKey < pNode->m_nKeys && pNode->m_pKeys[nKey] != NULL; ++ nKey)
+				std::cout << pNode->m_pKeys[nKey] << " ";
+			std::cout << std::endl;
+			for (size_t nKey = 0; nKey < pNode->m_nKeys + 1; ++ nKey) {
+				PrintTree(reinterpret_cast<CNode*> (pNode->m_ppPointer[nKey]));
+			}
+		}
+		else {
+			std::cout << "Node node!!!" << std::endl;
+			for (size_t nKey = 0; nKey < pNode->m_nKeys; ++nKey) {
+				int* nValue = (int*) pNode->m_ppPointer[nKey];
+				std::cout << *nValue << " ";
+			}
+			std::cout << std::endl;
+		}
 	}
 }
 
