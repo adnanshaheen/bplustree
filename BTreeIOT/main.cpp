@@ -107,8 +107,12 @@ int main(int argc, char* argv[])
 			cBTreeObj.Insert(Opts.nKEY, Opts.nKEY);
 		else if (Opts.eCommand == eDelete)				/* delete command */
 			cBTreeObj.Delete(Opts.nKEY);
-		else if (Opts.eCommand == eSelect)				/* select command */
-			cBTreeObj.Find(Opts.nKEY);
+		else if (Opts.eCommand == eSelect) {			/* select command */
+			if (cBTreeObj.Find(Opts.nKEY))
+				std::cout << Opts.nKEY << " found" << std::endl;
+			else
+				std::cerr << Opts.nKEY << " wasn't found!!!" << std::endl;
+		}
 		else if (Opts.eCommand == ePrint)
 			cBTreeObj.PrintTree();
 
