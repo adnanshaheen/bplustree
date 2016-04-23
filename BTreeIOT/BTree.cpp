@@ -401,7 +401,7 @@ CNode * CBTree::SplitInsertNode(CNode * pParent, const uint32_t nIndex, const in
 			pKeys[j] = pParent->m_pKeys[i];
 		}
 
-		ppNodePointers[nIndex + 1] = pParent;
+		ppNodePointers[nIndex + 1] = pRight;
 		pKeys[nIndex] = nKey;
 
 		/* Split in half */
@@ -413,7 +413,7 @@ CNode * CBTree::SplitInsertNode(CNode * pParent, const uint32_t nIndex, const in
 			pParent->m_pKeys[nPrevKeys] = pKeys[nPrevKeys];
 			pParent->IncKeys();
 		}
-		pParent->m_ppPointer[nPrevKeys] = ppNodePointers[nPrevKeys];
+		pParent->m_ppPointer[nPrevKeys] = ppNodePointers[nPrevKeys++];
 
 		pNode = MakeNode();		/* create new node */
 		if (pNode == NULL)
@@ -957,12 +957,17 @@ void CBTree::DeleteTree(CNode * pNode)
 {
 	try {
 		if (pNode) {
-			if (pNode->IsLeaf())
-				for (uint32_t nKey = 0; nKey < pNode->m_nKeys; ++nKey)
+			if (pNode->IsLeaf()) {
+				for (uint32_t nKey = 0; nKey < pNode->m_nKeys; ++nKey) {
 					delete pNode->m_ppPointer[nKey];
-			else
+					pNode->m_ppPointer[nKey] = NULL;
+				}
+			}
+			else {
 				for (uint32_t nKey = 0; nKey < pNode->m_nKeys + 1; ++nKey)
-					DeleteTree((CNode*)pNode->m_ppPointer[nKey]);
+					if (pNode->m_ppPointer[nKey])
+						DeleteTree((CNode*)pNode->m_ppPointer[nKey]);
+			}
 			delete pNode;
 			pNode = NULL;
 		}
@@ -987,6 +992,7 @@ void CBTree::PrintTree(CNode * pNode)
 		std::cout << " | ";
 		pNode = pNode->m_pNext;
 	}
+	std::cout << std::endl;
 }
 
 /*
