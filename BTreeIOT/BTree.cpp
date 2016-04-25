@@ -353,7 +353,7 @@ CNode * CBTree::InsertInNode(CNode * pParent, const uint32_t nIndex, const int n
 		if (pParent == NULL || pRight == NULL)		/* check parameters */
 			throw std::exception("Invalid parameters!!!");
 
-		for (uint32_t nKeyPos = pParent->m_nKeys; nKeyPos > 0; -- nKeyPos) {		/* update the pointers and keys */
+		for (uint32_t nKeyPos = pParent->m_nKeys; nKeyPos > nIndex; -- nKeyPos) {		/* update the pointers and keys */
 			pParent->m_ppPointer[nKeyPos + 1] = pParent->m_ppPointer[nKeyPos];
 			pParent->m_pKeys[nKeyPos] = pParent->m_pKeys[nKeyPos - 1];
 		}
@@ -430,7 +430,7 @@ CNode * CBTree::SplitInsertNode(CNode * pParent, const uint32_t nIndex, const in
 		pNode->m_ppPointer[nNextKeys] = ppNodePointers[nPrevKeys];
 
 		CNode* pChild = NULL;
-		for (uint32_t nNewKeys = 0; nNewKeys < pNode->m_nKeys; ++ nNewKeys) {
+		for (uint32_t nNewKeys = 0; nNewKeys < pNode->m_nKeys + 1; ++ nNewKeys) {
 			pChild = (CNode*) pNode->m_ppPointer[nNewKeys];
 			pChild->m_pParent = pNode;
 		}
@@ -828,8 +828,8 @@ CNode * CBTree::AdjustNodes(CNode * pNode, CNode * pNext, int nMiddle, int nNext
 			/* append the keys and pointers to next */
 			uint32_t nIndex = nNextKeys + 1;
 			uint32_t nNodeIndex = 0;
-			for (; nNodeIndex < pNode->m_nKeys;) {
-				pNext->m_pKeys[nIndex ++] = pNode->m_pKeys[nNodeIndex ++];		/* append keys */
+			for (; nNodeIndex < pNode->m_nKeys; nIndex ++, nNodeIndex ++) {
+				pNext->m_pKeys[nIndex] = pNode->m_pKeys[nNodeIndex];		/* append keys */
 				pNext->m_ppPointer[nIndex] = pNode->m_ppPointer[nNodeIndex];	/* append pointers */
 				pNext->m_nKeys ++;												/* increment keys in next */
 				pNode->m_nKeys --;												/* decrement keys in current */
@@ -855,6 +855,9 @@ CNode * CBTree::AdjustNodes(CNode * pNode, CNode * pNext, int nMiddle, int nNext
 				pNext->m_nKeys ++;													/* increment the keys */
 			}
 			pNext->m_ppPointer[GetOrder() - 1] = pNode->m_ppPointer[GetOrder() - 1];		/* copy last pointer */
+
+			if (pNode->m_nKeys == 0)												/* if we don't have any more nodes */
+				pNext->m_pNext = NULL;												/* set next to NULL */
 		}
 		m_pRoot = DeleteEntry(pNode->m_pParent, pNode, nMiddle);
 		delete pNode;
